@@ -3,6 +3,9 @@ defmodule GenObject do
     build(module, apply(module, :initialize, opts))
   end
 
+  def fire(object, message) do
+    module(object).handle_fire(state(object), message)
+  end
 
   def morph(object, message) do
     new_state = module(object).handle_morph(state(object), message)
