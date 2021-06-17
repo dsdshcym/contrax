@@ -1,7 +1,13 @@
 defmodule GenObject do
-  defmacro __using__(_opts) do
+  defmacro __using__(opts) do
+    interfaces = Keyword.get(opts, :implement, [])
+
     quote do
       @before_compile GenObject
+
+      for interface <- unquote(interfaces) do
+        @behaviour interface
+      end
     end
   end
 
@@ -48,7 +54,11 @@ defmodule GenObject do
   end
 
   defmacro def([{:fire, {name, _, args}}]) when is_atom(name) and is_list(args) do
+    arity = length(args)
+    type_args = :lists.map(fn _ -> quote(do: term) end, :lists.seq(1, arity))
+
     quote do
+      @callback unquote(name)(unquote_splicing(type_args)) :: term
       Kernel.def unquote(name)(unquote_splicing(args)) do
         GenObject.fire(unquote(hd(args)), unquote(name), unquote(tl(args)))
       end
@@ -56,7 +66,11 @@ defmodule GenObject do
   end
 
   defmacro def([{:morph, {name, _, args}}]) when is_atom(name) and is_list(args) do
+    arity = length(args)
+    type_args = :lists.map(fn _ -> quote(do: term) end, :lists.seq(1, arity))
+
     quote do
+      @callback unquote(name)(unquote_splicing(type_args)) :: term
       Kernel.def unquote(name)(unquote_splicing(args)) do
         GenObject.morph(unquote(hd(args)), unquote(name), unquote(tl(args)))
       end
@@ -64,7 +78,11 @@ defmodule GenObject do
   end
 
   defmacro def([{:ask, {name, _, args}}]) when is_atom(name) and is_list(args) do
+    arity = length(args)
+    type_args = :lists.map(fn _ -> quote(do: term) end, :lists.seq(1, arity))
+
     quote do
+      @callback unquote(name)(unquote_splicing(type_args)) :: {term, term}
       Kernel.def unquote(name)(unquote_splicing(args)) do
         GenObject.ask(unquote(hd(args)), unquote(name), unquote(tl(args)))
       end

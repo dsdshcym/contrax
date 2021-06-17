@@ -14,7 +14,7 @@ GenObject.definterface Queue do
 end
 
 defmodule ErlQueue do
-  use GenObject
+  use GenObject, implement: [Queue]
 
   # defimplementation Queue do
   def initialize() do
@@ -41,7 +41,7 @@ end
 defmodule ListQueue do
   # defimplementation Queue do
 
-  use GenObject
+  use GenObject, implement: [Queue]
 
   def initialize() do
     []
