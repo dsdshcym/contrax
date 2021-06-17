@@ -27,7 +27,7 @@ defmodule GenObject do
   defmacro def([{:morph, {name, _, args}}]) when is_atom(name) and is_list(args) do
     quote do
       Kernel.def unquote(name)(unquote_splicing(args)) do
-        GenObject.morph(unquote(hd(args)), {unquote(name), unquote_splicing(tl(args))})
+        GenObject.morph(unquote(hd(args)), unquote(name), unquote(tl(args)))
       end
     end
   end
@@ -35,7 +35,7 @@ defmodule GenObject do
   defmacro def([{:ask, {name, _, args}}]) when is_atom(name) and is_list(args) do
     quote do
       Kernel.def unquote(name)(unquote_splicing(args)) do
-        GenObject.ask(unquote(hd(args)), unquote(name))
+        GenObject.ask(unquote(hd(args)), unquote(name), unquote(tl(args)))
       end
     end
   end
@@ -48,14 +48,14 @@ defmodule GenObject do
     module(object).handle_fire(state(object), message)
   end
 
-  def morph(object, message) do
-    new_state = module(object).handle_morph(state(object), message)
+  def morph(object, message, args) do
+    new_state = apply(module(object), message, [state(object) | args])
 
     put_state(object, new_state)
   end
 
-  def ask(object, message) do
-    {new_state, output} = module(object).handle_ask(state(object), message)
+  def ask(object, message, args) do
+    {new_state, output} = apply(module(object), message, [state(object) | args])
 
     {put_state(object, new_state), output}
   end

@@ -19,11 +19,11 @@ defmodule ErlQueue do
     :queue.new()
   end
 
-  def handle_morph(state, {:enqueue, item}) do
+  def enqueue(state, item) do
     :queue.in(item, state)
   end
 
-  def handle_ask(state, :dequeue) do
+  def dequeue(state) do
     case :queue.out(state) do
       {{:value, item}, new_state} ->
         {new_state, item}
@@ -42,11 +42,11 @@ defmodule ListQueue do
     []
   end
 
-  def handle_morph(state, {:enqueue, item}) do
+  def enqueue(state, item) do
     state ++ [item]
   end
 
-  def handle_ask(state, :dequeue) do
+  def dequeue(state) do
     case state do
       [item | rest] ->
         {rest, item}
