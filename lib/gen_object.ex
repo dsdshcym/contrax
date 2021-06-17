@@ -47,6 +47,14 @@ defmodule GenObject do
     end
   end
 
+  defmacro def([{:fire, {name, _, args}}]) when is_atom(name) and is_list(args) do
+    quote do
+      Kernel.def unquote(name)(unquote_splicing(args)) do
+        GenObject.fire(unquote(hd(args)), unquote(name), unquote(tl(args)))
+      end
+    end
+  end
+
   defmacro def([{:morph, {name, _, args}}]) when is_atom(name) and is_list(args) do
     quote do
       Kernel.def unquote(name)(unquote_splicing(args)) do
@@ -67,8 +75,8 @@ defmodule GenObject do
     build(module, apply(module, :initialize, opts))
   end
 
-  def fire(object, message) do
-    module(object).handle_fire(state(object), message)
+  def fire(object, message, args) do
+    apply(module(object), message, [state(object) | args])
   end
 
   def morph(object, message, args) do
