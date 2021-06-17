@@ -16,7 +16,7 @@ defmodule GenObject do
 
       quote do
         def new(unquote_splicing(args)) do
-          GenObject.new(__MODULE__, unquote_splicing(args))
+          GenObject.new(__MODULE__, unquote(args))
         end
       end
     end
