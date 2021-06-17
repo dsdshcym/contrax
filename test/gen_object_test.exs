@@ -1,3 +1,5 @@
+require GenObject
+
 GenObject.definterface Queue do
   def morph: enqueue(queue, item)
 
