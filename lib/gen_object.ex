@@ -3,14 +3,17 @@ defmodule GenObject do
     build(module, apply(module, :initialize, opts))
   end
 
-  def dispatch(object, message) do
-    case module(object).handle_dispatch(state(object), message) do
-      {:no_output, new_state} ->
-        put_state(object, new_state)
 
-      {:output, new_state, output} ->
-        {put_state(object, new_state), output}
-    end
+  def morph(object, message) do
+    new_state = module(object).handle_morph(state(object), message)
+
+    put_state(object, new_state)
+  end
+
+  def ask(object, message) do
+    {new_state, output} = module(object).handle_ask(state(object), message)
+
+    {put_state(object, new_state), output}
   end
 
   defp build(module, state), do: {module, state}

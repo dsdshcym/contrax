@@ -3,11 +3,11 @@ defmodule Queue do
   @callback dequeue(internal :: any()) :: {any(), any()}
 
   def enqueue(queue, item) do
-    GenObject.dispatch(queue, {:enqueue, item})
+    GenObject.morph(queue, {:enqueue, item})
   end
 
   def dequeue(queue) do
-    GenObject.dispatch(queue, :dequeue)
+    GenObject.ask(queue, :dequeue)
   end
 
   # term "first in first out", %{object: object} do
@@ -24,17 +24,17 @@ defmodule ErlQueue do
     :queue.new()
   end
 
-  def handle_dispatch(state, {:enqueue, item}) do
-    {:no_output, :queue.in(item, state)}
+  def handle_morph(state, {:enqueue, item}) do
+    :queue.in(item, state)
   end
 
-  def handle_dispatch(state, :dequeue) do
+  def handle_ask(state, :dequeue) do
     case :queue.out(state) do
       {{:value, item}, new_state} ->
-        {:output, new_state, item}
+        {new_state, item}
 
       {:empty, new_state} ->
-        {:output, new_state, :empty}
+        {new_state, :empty}
     end
   end
 
@@ -47,17 +47,17 @@ defmodule ListQueue do
     []
   end
 
-  def handle_dispatch(state, {:enqueue, item}) do
-    {:no_output, state ++ [item]}
+  def handle_morph(state, {:enqueue, item}) do
+    state ++ [item]
   end
 
-  def handle_dispatch(state, :dequeue) do
+  def handle_ask(state, :dequeue) do
     case state do
       [item | rest] ->
-        {:output, rest, item}
+        {rest, item}
 
       [] ->
-        {:output, state, :empty}
+        {state, :empty}
     end
   end
 
