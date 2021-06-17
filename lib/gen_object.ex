@@ -83,8 +83,10 @@ defmodule GenObject do
     {put_state(object, new_state), output}
   end
 
-  defp build(module, state), do: {module, state}
-  defp module({module, _state}), do: module
-  defp state({_module, state}), do: state
+  defstruct [:module, :state]
+
+  defp build(module, state), do: %__MODULE__{module: module, state: state}
+  defp module(object), do: object.module
+  defp state(object), do: object.state
   defp put_state(object, new_state), do: object |> module() |> build(new_state)
 end
