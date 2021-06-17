@@ -14,10 +14,7 @@ GenObject.definterface Queue do
 end
 
 defmodule ErlQueue do
-
-  def new() do
-    GenObject.new(__MODULE__)
-  end
+  use GenObject
 
   # defimplementation Queue do
   def initialize() do
@@ -44,9 +41,7 @@ end
 defmodule ListQueue do
   # defimplementation Queue do
 
-  def new() do
-    GenObject.new(__MODULE__)
-  end
+  use GenObject
 
   def initialize() do
     []

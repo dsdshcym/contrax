@@ -1,4 +1,27 @@
 defmodule GenObject do
+  defmacro __using__(_opts) do
+    quote do
+      @before_compile GenObject
+    end
+  end
+
+  defmacro __before_compile__(env) do
+    initializes =
+      env.module
+      |> Module.definitions_in(:def)
+      |> Enum.filter(&match?({:initialize, _}, &1))
+
+    for {:initialize, arity} <- initializes do
+      args = Macro.generate_unique_arguments(arity, env.module)
+
+      quote do
+        def new(unquote_splicing(args)) do
+          GenObject.new(__MODULE__, unquote_splicing(args))
+        end
+      end
+    end
+  end
+
   defmacro definterface(name, do: block) do
     quote do
       defmodule unquote(name) do
