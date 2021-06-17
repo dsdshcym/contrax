@@ -1,14 +1,7 @@
-defmodule Queue do
-  @callback enqueue(internal :: any(), item :: any()) :: any()
-  @callback dequeue(internal :: any()) :: {any(), any()}
+GenObject.definterface Queue do
+  def morph: enqueue(queue, item)
 
-  def enqueue(queue, item) do
-    GenObject.morph(queue, {:enqueue, item})
-  end
-
-  def dequeue(queue) do
-    GenObject.ask(queue, :dequeue)
-  end
+  def ask: dequeue(queue)
 
   # term "first in first out", %{object: object} do
   #   q1 = object |> Queue.enqueue(1) |> Queue.enqueue(2)

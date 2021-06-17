@@ -1,18 +1,20 @@
-defmodule GenMover do
-  def run(mover, source, destination) do
-    GenObject.fire(mover, {:run, source, destination})
-  end
+GenObject.definterface GenMover do
+  def fire: run(mover, source, destination)
 end
 
 defmodule ConcatMover do
+  use GenObject
+
   def initialize(m1, m2) do
     [m1, m2]
   end
 
-  def handle_fire([m1, m2], {:run, source, destination}) do
-    with :ok <- GenMover.run(m1, source, destination),
-         :ok <- GenMover.run(m2, source, destination) do
-      :ok
+  implement GenMover do
+    def run([m1, m2], source, destination) do
+      with :ok <- GenMover.run(m1, source, destination),
+           :ok <- GenMover.run(m2, source, destination) do
+        :ok
+      end
     end
   end
 end
