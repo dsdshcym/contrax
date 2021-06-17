@@ -14,6 +14,11 @@ GenObject.definterface Queue do
 end
 
 defmodule ErlQueue do
+
+  def new() do
+    GenObject.new(__MODULE__)
+  end
+
   # defimplementation Queue do
   def initialize() do
     :queue.new()
@@ -38,6 +43,11 @@ end
 
 defmodule ListQueue do
   # defimplementation Queue do
+
+  def new() do
+    GenObject.new(__MODULE__)
+  end
+
   def initialize() do
     []
   end
@@ -66,7 +76,7 @@ defmodule ErlQueueTest do
   use ExUnit.Case, asnyc: true
 
   test "first in first out" do
-    q1 = GenObject.new(ErlQueue) |> Queue.enqueue(1) |> Queue.enqueue(2)
+    q1 = ErlQueue.new() |> Queue.enqueue(1) |> Queue.enqueue(2)
     assert {q2, 1} = Queue.dequeue(q1)
     assert {q3, 2} = Queue.dequeue(q2)
     assert {^q3, :empty} = Queue.dequeue(q3)
@@ -77,7 +87,7 @@ defmodule ListQueueTest do
   use ExUnit.Case, asnyc: true
 
   test "first in first out" do
-    q1 = GenObject.new(ListQueue) |> Queue.enqueue(1) |> Queue.enqueue(2)
+    q1 = ListQueue.new() |> Queue.enqueue(1) |> Queue.enqueue(2)
     assert {q2, 1} = Queue.dequeue(q1)
     assert {q3, 2} = Queue.dequeue(q2)
     assert {^q3, :empty} = Queue.dequeue(q3)
