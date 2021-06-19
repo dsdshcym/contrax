@@ -12,11 +12,13 @@ GenObject.definterface Queue do
       subject = Keyword.fetch!(opts, :subject)
 
       quote do
-        test "first in first out" do
-          q1 = unquote(subject) |> Queue.enqueue(1) |> Queue.enqueue(2)
-          assert {1, q2} = Queue.dequeue(q1)
-          assert {2, q3} = Queue.dequeue(q2)
-          assert {:empty, ^q3} = Queue.dequeue(q3)
+        describe "enqueue |> dequeue" do
+          test "first in first out" do
+            q1 = unquote(subject) |> Queue.enqueue(1) |> Queue.enqueue(2)
+            assert {1, q2} = Queue.dequeue(q1)
+            assert {2, q3} = Queue.dequeue(q2)
+            assert {:empty, ^q3} = Queue.dequeue(q3)
+          end
         end
       end
     end
