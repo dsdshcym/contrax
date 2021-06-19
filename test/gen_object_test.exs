@@ -5,6 +5,16 @@ GenObject.definterface Queue do
 
   def ask: dequeue(queue)
 
+  def to_list(queue) do
+    case dequeue(queue) do
+      {:empty, _} ->
+        []
+
+      {value, rest} ->
+        [value | to_list(rest)]
+    end
+  end
+
   defmodule Case do
     use ExUnit.CaseTemplate
 
@@ -18,6 +28,17 @@ GenObject.definterface Queue do
             assert {1, q2} = Queue.dequeue(q1)
             assert {2, q3} = Queue.dequeue(q2)
             assert {:empty, ^q3} = Queue.dequeue(q3)
+          end
+        end
+
+        describe "enqueue |> to_list" do
+          test "first in first out" do
+            assert unquote(subject)
+                   |> Queue.enqueue(1)
+                   |> Queue.enqueue(2)
+                   |> Queue.enqueue(3)
+                   |> Queue.enqueue(4)
+                   |> Queue.to_list() == [1, 2, 3, 4]
           end
         end
       end
