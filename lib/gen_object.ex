@@ -3,6 +3,8 @@ defmodule GenObject do
     interfaces = Keyword.get(opts, :implements, [])
 
     quote do
+      import GenObject.Object, only: [deconstruct: 1]
+
       for interface <- unquote(interfaces) do
         @beahviour interface
       end
@@ -73,13 +75,19 @@ defmodule GenObject do
   defmodule Object do
     defstruct [:module, :state]
 
+    defmacro deconstruct(pattern) do
+      quote do
+        %unquote(__MODULE__){module: __MODULE__, state: unquote(pattern)}
+      end
+    end
+
     def build(module, state), do: %__MODULE__{module: module, state: state}
     def module(object), do: object.module
     def state(object), do: object.state
     def put_state(object, new_state), do: object |> module() |> build(new_state)
 
     def dispatch(object, message, args) do
-      apply(module(object), message, [state(object) | args])
+      apply(module(object), message, [object | args])
     end
   end
 
