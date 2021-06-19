@@ -105,7 +105,7 @@ defmodule ListQueue do
         {item, construct(rest)}
 
       [] ->
-        {:empty, construct(state)}
+        {:empty, this}
     end
   end
 end
