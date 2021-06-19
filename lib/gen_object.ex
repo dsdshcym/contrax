@@ -100,21 +100,23 @@ defmodule GenObject do
   end
 
   def fire(interface, object, message, args) do
-    apply(Module.safe_concat(interface, module(object)), message, [state(object) | args])
+    dispatch(interface, object, message, args)
   end
 
   def morph(interface, object, message, args) do
-    new_state =
-      apply(Module.safe_concat(interface, module(object)), message, [state(object) | args])
+    new_state = dispatch(interface, object, message, args)
 
     put_state(object, new_state)
   end
 
   def ask(interface, object, message, args) do
-    {output, new_state} =
-      apply(Module.safe_concat(interface, module(object)), message, [state(object) | args])
+    {output, new_state} = dispatch(interface, object, message, args)
 
     {output, put_state(object, new_state)}
+  end
+
+  defp dispatch(interface, object, message, args) do
+    apply(Module.safe_concat(interface, module(object)), message, [state(object) | args])
   end
 
   defstruct [:module, :state]
