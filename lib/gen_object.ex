@@ -87,9 +87,10 @@ defmodule GenObject do
 
     quote do
       def unquote(name)(
-            GenObject.Object.deconstruct(unquote(state)),
+            GenObject.Object.deconstruct(unquote(state)) = var!(this),
             unquote_splicing(rest_args)
-          ) do
+          )
+          when is_map(var!(this)) do
         unquote(block)
       end
     end
