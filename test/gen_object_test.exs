@@ -14,6 +14,13 @@ GenObject.definterface Queue do
     end
   end
 
+  def concat(q1, q2) do
+    case dequeue(q2) do
+      {:empty, _} -> q1
+      {item, q} -> concat(enqueue(q1, item), q)
+    end
+  end
+
   defmodule Case do
     use ExUnit.CaseTemplate
 
@@ -23,6 +30,16 @@ GenObject.definterface Queue do
       quote do
         defp subject do
           unquote(subject)
+        end
+
+        test "concat" do
+          q1 = subject() |> Queue.enqueue(1) |> Queue.enqueue(2)
+          q2 = subject() |> Queue.enqueue(3) |> Queue.enqueue(4)
+
+          assert q1
+                 |> Queue.concat(q2)
+                 |> Queue.to_list() ==
+                   [1, 2, 3, 4]
         end
 
         describe "enqueue |> dequeue" do
