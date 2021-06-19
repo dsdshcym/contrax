@@ -97,34 +97,36 @@ defmodule GenObject do
     end
   end
 
+  defmodule Object do
+    defstruct [:module, :state]
+
+    def build(module, state), do: %__MODULE__{module: module, state: state}
+    def module(object), do: object.module
+    def state(object), do: object.state
+    def put_state(object, new_state), do: object |> module() |> build(new_state)
+
+    def dispatch(interface, object, message, args) do
+      apply(Module.safe_concat(interface, module(object)), message, [state(object) | args])
+    end
+  end
+
   def new(module, opts \\ []) do
-    build(module, apply(module, :initialize, opts))
+    Object.build(module, apply(module, :initialize, opts))
   end
 
   def fire(interface, object, message, args) do
-    dispatch(interface, object, message, args)
+    Object.dispatch(interface, object, message, args)
   end
 
   def morph(interface, object, message, args) do
-    new_state = dispatch(interface, object, message, args)
+    new_state = Object.dispatch(interface, object, message, args)
 
-    put_state(object, new_state)
+    Object.put_state(object, new_state)
   end
 
   def ask(interface, object, message, args) do
-    {output, new_state} = dispatch(interface, object, message, args)
+    {output, new_state} = Object.dispatch(interface, object, message, args)
 
-    {output, put_state(object, new_state)}
+    {output, Object.put_state(object, new_state)}
   end
-
-  defp dispatch(interface, object, message, args) do
-    apply(Module.safe_concat(interface, module(object)), message, [state(object) | args])
-  end
-
-  defstruct [:module, :state]
-
-  defp build(module, state), do: %__MODULE__{module: module, state: state}
-  defp module(object), do: object.module
-  defp state(object), do: object.state
-  defp put_state(object, new_state), do: object |> module() |> build(new_state)
 end
