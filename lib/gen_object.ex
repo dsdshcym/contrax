@@ -1,13 +1,16 @@
 defmodule GenObject do
-  defmacro __using__(opts) do
-    interfaces = Keyword.get(opts, :implement, [])
-
+  defmacro __using__(_opts) do
     quote do
+      import GenObject, only: [implement: 2]
       @before_compile GenObject
+    end
+  end
 
-      for interface <- unquote(interfaces) do
-        @behaviour interface
-      end
+  defmacro implement(interface, do: block) do
+    quote do
+      @behaviour Elixir.unquote(interface)
+
+      _ = unquote(block)
     end
   end
 

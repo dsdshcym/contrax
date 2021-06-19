@@ -11,15 +11,14 @@ defmodule ConcatMover do
     [m1, m2]
   end
 
-  # implement GenMover do
-  def run([m1, m2], source, destination) do
-    with :ok <- GenMover.run(m1, source, destination),
-         :ok <- GenMover.run(m2, source, destination) do
-      :ok
+  implement GenMover do
+    def run([m1, m2], source, destination) do
+      with :ok <- GenMover.run(m1, source, destination),
+           :ok <- GenMover.run(m2, source, destination) do
+        :ok
+      end
     end
   end
-
-  # end
 end
 
 defmodule OKMover do
@@ -29,8 +28,10 @@ defmodule OKMover do
     __MODULE__
   end
 
-  def run(__MODULE__, _source, _destination) do
-    :ok
+  implement GenMover do
+    def run(__MODULE__, _source, _destination) do
+      :ok
+    end
   end
 end
 
@@ -41,8 +42,10 @@ defmodule ErrorMover do
     error
   end
 
-  def run(error, _source, _destination) do
-    {:error, error}
+  implement GenMover do
+    def run(error, _source, _destination) do
+      {:error, error}
+    end
   end
 end
 
