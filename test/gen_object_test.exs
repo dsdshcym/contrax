@@ -7,8 +7,8 @@ GenObject.definterface Queue do
 
   # term "first in first out", %{object: object} do
   #   q1 = object |> Queue.enqueue(1) |> Queue.enqueue(2)
-  #   assert {q2, 1} = Queue.dequeue(q1)
-  #   assert {q3, 2} = Queue.dequeue(q2)
+  #   assert {1, q2} = Queue.dequeue(q1)
+  #   assert {2, q3} = Queue.dequeue(q2)
   #   assert {:empty, ^q3} = Queue.dequeue(q3)
   # end
 end
@@ -28,10 +28,10 @@ defmodule ErlQueue do
   def dequeue(state) do
     case :queue.out(state) do
       {{:value, item}, new_state} ->
-        {new_state, item}
+        {item, new_state}
 
       {:empty, new_state} ->
-        {new_state, :empty}
+        {:empty, new_state}
     end
   end
 
@@ -54,10 +54,10 @@ defmodule ListQueue do
   def dequeue(state) do
     case state do
       [item | rest] ->
-        {rest, item}
+        {item, rest}
 
       [] ->
-        {state, :empty}
+        {:empty, state}
     end
   end
 
@@ -72,9 +72,9 @@ defmodule ErlQueueTest do
 
   test "first in first out" do
     q1 = ErlQueue.new() |> Queue.enqueue(1) |> Queue.enqueue(2)
-    assert {q2, 1} = Queue.dequeue(q1)
-    assert {q3, 2} = Queue.dequeue(q2)
-    assert {^q3, :empty} = Queue.dequeue(q3)
+    assert {1, q2} = Queue.dequeue(q1)
+    assert {2, q3} = Queue.dequeue(q2)
+    assert {:empty, ^q3} = Queue.dequeue(q3)
   end
 end
 
@@ -83,8 +83,8 @@ defmodule ListQueueTest do
 
   test "first in first out" do
     q1 = ListQueue.new() |> Queue.enqueue(1) |> Queue.enqueue(2)
-    assert {q2, 1} = Queue.dequeue(q1)
-    assert {q3, 2} = Queue.dequeue(q2)
-    assert {^q3, :empty} = Queue.dequeue(q3)
+    assert {1, q2} = Queue.dequeue(q1)
+    assert {2, q3} = Queue.dequeue(q2)
+    assert {:empty, ^q3} = Queue.dequeue(q3)
   end
 end

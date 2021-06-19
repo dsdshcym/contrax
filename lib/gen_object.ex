@@ -104,9 +104,9 @@ defmodule GenObject do
   end
 
   def ask(object, message, args) do
-    {new_state, output} = apply(module(object), message, [state(object) | args])
+    {output, new_state} = apply(module(object), message, [state(object) | args])
 
-    {put_state(object, new_state), output}
+    {output, put_state(object, new_state)}
   end
 
   defstruct [:module, :state]
