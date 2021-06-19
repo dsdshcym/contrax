@@ -5,12 +5,22 @@ GenObject.definterface Queue do
 
   def ask: dequeue(queue)
 
-  # term "first in first out", %{object: object} do
-  #   q1 = object |> Queue.enqueue(1) |> Queue.enqueue(2)
-  #   assert {1, q2} = Queue.dequeue(q1)
-  #   assert {2, q3} = Queue.dequeue(q2)
-  #   assert {:empty, ^q3} = Queue.dequeue(q3)
-  # end
+  defmodule Case do
+    use ExUnit.CaseTemplate
+
+    using opts do
+      subject = Keyword.fetch!(opts, :subject)
+
+      quote do
+        test "first in first out" do
+          q1 = unquote(subject) |> Queue.enqueue(1) |> Queue.enqueue(2)
+          assert {1, q2} = Queue.dequeue(q1)
+          assert {2, q3} = Queue.dequeue(q2)
+          assert {:empty, ^q3} = Queue.dequeue(q3)
+        end
+      end
+    end
+  end
 end
 
 defmodule ErlQueue do
@@ -68,23 +78,9 @@ end
 # also expand all the `terms` into `tests`
 
 defmodule ErlQueueTest do
-  use ExUnit.Case, asnyc: true
-
-  test "first in first out" do
-    q1 = ErlQueue.new() |> Queue.enqueue(1) |> Queue.enqueue(2)
-    assert {1, q2} = Queue.dequeue(q1)
-    assert {2, q3} = Queue.dequeue(q2)
-    assert {:empty, ^q3} = Queue.dequeue(q3)
-  end
+  use Queue.Case, async: true, subject: ErlQueue.new()
 end
 
 defmodule ListQueueTest do
-  use ExUnit.Case, asnyc: true
-
-  test "first in first out" do
-    q1 = ListQueue.new() |> Queue.enqueue(1) |> Queue.enqueue(2)
-    assert {1, q2} = Queue.dequeue(q1)
-    assert {2, q3} = Queue.dequeue(q2)
-    assert {:empty, ^q3} = Queue.dequeue(q3)
-  end
+  use Queue.Case, async: true, subject: ListQueue.new()
 end
