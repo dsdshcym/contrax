@@ -6,7 +6,7 @@ defmodule GenObject do
       import GenObject.Object, only: [deconstruct: 1]
 
       for interface <- unquote(interfaces) do
-        @beahviour interface
+        @behaviour interface
       end
 
       defp construct(state) do
