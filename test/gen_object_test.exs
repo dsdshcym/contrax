@@ -99,15 +99,8 @@ defmodule ListQueue do
     construct(state ++ [item])
   end
 
-  def dequeue(state) do
-    case state do
-      [item | rest] ->
-        {item, construct(rest)}
-
-      [] ->
-        {:empty, this}
-    end
-  end
+  def dequeue([]), do: {:empty, this}
+  def dequeue([item | rest]), do: {item, construct(rest)}
 end
 
 defmodule ErlQueueTest do
