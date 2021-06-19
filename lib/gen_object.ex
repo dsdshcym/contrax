@@ -15,7 +15,7 @@ defmodule GenObject do
       defmodule name do
         @behaviour Elixir.unquote(interface)
 
-        defp new(state) do
+        defp construct(state) do
           GenObject.Object.build(unquote(for), state)
         end
 

@@ -76,16 +76,16 @@ defmodule ErlQueue do
 
   implement Queue do
     def enqueue(state, item) do
-      new(:queue.in(item, state))
+      construct(:queue.in(item, state))
     end
 
     def dequeue(state) do
       case :queue.out(state) do
         {{:value, item}, new_state} ->
-          {item, new(new_state)}
+          {item, construct(new_state)}
 
         {:empty, new_state} ->
-          {:empty, new(new_state)}
+          {:empty, construct(new_state)}
       end
     end
   end
@@ -104,16 +104,16 @@ defmodule ListQueue do
 
   implement Queue do
     def enqueue(state, item) do
-      new(state ++ [item])
+      construct(state ++ [item])
     end
 
     def dequeue(state) do
       case state do
         [item | rest] ->
-          {item, new(rest)}
+          {item, construct(rest)}
 
         [] ->
-          {:empty, new(state)}
+          {:empty, construct(state)}
       end
     end
   end
