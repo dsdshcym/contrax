@@ -8,9 +8,13 @@ defmodule GenObject do
 
   defmacro implement(interface, do: block) do
     quote do
-      @behaviour Elixir.unquote(interface)
+      name = Module.concat(unquote(interface), __MODULE__)
 
-      _ = unquote(block)
+      defmodule name do
+        @behaviour Elixir.unquote(interface)
+
+        _ = unquote(block)
+      end
     end
   end
 
@@ -62,7 +66,7 @@ defmodule GenObject do
     quote do
       @callback unquote(name)(unquote_splicing(type_args)) :: term
       Kernel.def unquote(name)(unquote_splicing(args)) do
-        GenObject.fire(unquote(hd(args)), unquote(name), unquote(tl(args)))
+        GenObject.fire(__MODULE__, unquote(hd(args)), unquote(name), unquote(tl(args)))
       end
     end
   end
@@ -74,7 +78,7 @@ defmodule GenObject do
     quote do
       @callback unquote(name)(unquote_splicing(type_args)) :: term
       Kernel.def unquote(name)(unquote_splicing(args)) do
-        GenObject.morph(unquote(hd(args)), unquote(name), unquote(tl(args)))
+        GenObject.morph(__MODULE__, unquote(hd(args)), unquote(name), unquote(tl(args)))
       end
     end
   end
@@ -86,7 +90,7 @@ defmodule GenObject do
     quote do
       @callback unquote(name)(unquote_splicing(type_args)) :: {term, term}
       Kernel.def unquote(name)(unquote_splicing(args)) do
-        GenObject.ask(unquote(hd(args)), unquote(name), unquote(tl(args)))
+        GenObject.ask(__MODULE__, unquote(hd(args)), unquote(name), unquote(tl(args)))
       end
     end
   end
@@ -95,18 +99,20 @@ defmodule GenObject do
     build(module, apply(module, :initialize, opts))
   end
 
-  def fire(object, message, args) do
-    apply(module(object), message, [state(object) | args])
+  def fire(interface, object, message, args) do
+    apply(Module.safe_concat(interface, module(object)), message, [state(object) | args])
   end
 
-  def morph(object, message, args) do
-    new_state = apply(module(object), message, [state(object) | args])
+  def morph(interface, object, message, args) do
+    new_state =
+      apply(Module.safe_concat(interface, module(object)), message, [state(object) | args])
 
     put_state(object, new_state)
   end
 
-  def ask(object, message, args) do
-    {output, new_state} = apply(module(object), message, [state(object) | args])
+  def ask(interface, object, message, args) do
+    {output, new_state} =
+      apply(Module.safe_concat(interface, module(object)), message, [state(object) | args])
 
     {output, put_state(object, new_state)}
   end

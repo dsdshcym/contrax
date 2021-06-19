@@ -29,7 +29,7 @@ defmodule OKMover do
   end
 
   implement GenMover do
-    def run(__MODULE__, _source, _destination) do
+    def run(OKMover, _source, _destination) do
       :ok
     end
   end
