@@ -34,7 +34,6 @@ defmodule GenObject do
         import Kernel,
           except: [
             def: 1,
-            def: 2,
             defp: 1,
             defp: 2,
             defdelegate: 2,
