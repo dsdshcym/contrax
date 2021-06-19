@@ -67,58 +67,47 @@ GenObject.definterface Queue do
 end
 
 defmodule ErlQueue do
-  use GenObject
+  use GenObject, implements: [Queue]
 
-  # defimplementation Queue do
   def initialize() do
     :queue.new()
   end
 
-  implement Queue do
-    def enqueue(state, item) do
-      construct(:queue.in(item, state))
-    end
-
-    def dequeue(state) do
-      case :queue.out(state) do
-        {{:value, item}, new_state} ->
-          {item, construct(new_state)}
-
-        {:empty, new_state} ->
-          {:empty, construct(new_state)}
-      end
-    end
+  def enqueue(state, item) do
+    construct(:queue.in(item, state))
   end
 
-  # end
+  def dequeue(state) do
+    case :queue.out(state) do
+      {{:value, item}, new_state} ->
+        {item, construct(new_state)}
+
+      {:empty, new_state} ->
+        {:empty, construct(new_state)}
+    end
+  end
 end
 
 defmodule ListQueue do
-  # defimplementation Queue do
-
-  use GenObject
+  use GenObject, implements: [Queue]
 
   def initialize() do
     []
   end
 
-  implement Queue do
-    def enqueue(state, item) do
-      construct(state ++ [item])
-    end
-
-    def dequeue(state) do
-      case state do
-        [item | rest] ->
-          {item, construct(rest)}
-
-        [] ->
-          {:empty, construct(state)}
-      end
-    end
+  def enqueue(state, item) do
+    construct(state ++ [item])
   end
 
-  # end
+  def dequeue(state) do
+    case state do
+      [item | rest] ->
+        {item, construct(rest)}
+
+      [] ->
+        {:empty, construct(state)}
+    end
+  end
 end
 
 defmodule ErlQueueTest do

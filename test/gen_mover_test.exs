@@ -5,47 +5,41 @@ GenObject.definterface GenMover do
 end
 
 defmodule ConcatMover do
-  use GenObject
+  use GenObject, implements: [GenMover]
 
   def initialize(m1, m2) do
     [m1, m2]
   end
 
-  implement GenMover do
-    def run([m1, m2], source, destination) do
-      with :ok <- GenMover.run(m1, source, destination),
-           :ok <- GenMover.run(m2, source, destination) do
-        :ok
-      end
-    end
-  end
-end
-
-defmodule OKMover do
-  use GenObject
-
-  def initialize() do
-    __MODULE__
-  end
-
-  implement GenMover do
-    def run(OKMover, _source, _destination) do
+  def run([m1, m2], source, destination) do
+    with :ok <- GenMover.run(m1, source, destination),
+         :ok <- GenMover.run(m2, source, destination) do
       :ok
     end
   end
 end
 
+defmodule OKMover do
+  use GenObject, implements: [GenMover]
+
+  def initialize() do
+    __MODULE__
+  end
+
+  def run(OKMover, _source, _destination) do
+    :ok
+  end
+end
+
 defmodule ErrorMover do
-  use GenObject
+  use GenObject, implements: [GenMover]
 
   def initialize(error) do
     error
   end
 
-  implement GenMover do
-    def run(error, _source, _destination) do
-      {:error, error}
-    end
+  def run(error, _source, _destination) do
+    {:error, error}
   end
 end
 

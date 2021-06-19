@@ -1,26 +1,17 @@
 defmodule GenObject do
-  defmacro __using__(_opts) do
-    quote do
-      import GenObject, only: [implement: 2]
-      @before_compile GenObject
-    end
-  end
-
-  defmacro implement(interface, do: block) do
-    for = __CALLER__.module
+  defmacro __using__(opts) do
+    interfaces = Keyword.get(opts, :implements, [])
 
     quote do
-      name = Module.concat(unquote(interface), __MODULE__)
-
-      defmodule name do
-        @behaviour Elixir.unquote(interface)
-
-        defp construct(state) do
-          GenObject.Object.build(unquote(for), state)
-        end
-
-        _ = unquote(block)
+      for interface <- unquote(interfaces) do
+        @beahviour interface
       end
+
+      defp construct(state) do
+        GenObject.Object.build(__MODULE__, state)
+      end
+
+      @before_compile GenObject
     end
   end
 
@@ -74,7 +65,7 @@ defmodule GenObject do
     quote do
       @callback unquote(name)(unquote_splicing(type_args)) :: term
       Kernel.def unquote(name)(unquote_splicing(args)) do
-        GenObject.Object.dispatch(__MODULE__, unquote(hd(args)), unquote(name), unquote(tl(args)))
+        GenObject.Object.dispatch(unquote(hd(args)), unquote(name), unquote(tl(args)))
       end
     end
   end
@@ -87,8 +78,8 @@ defmodule GenObject do
     def state(object), do: object.state
     def put_state(object, new_state), do: object |> module() |> build(new_state)
 
-    def dispatch(interface, object, message, args) do
-      apply(Module.safe_concat(interface, module(object)), message, [state(object) | args])
+    def dispatch(object, message, args) do
+      apply(module(object), message, [state(object) | args])
     end
   end
 
