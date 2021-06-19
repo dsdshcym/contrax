@@ -24,6 +24,8 @@ defmodule GenObject do
       |> Module.definitions_in(:def)
       |> Enum.filter(&match?({:initialize, _}, &1))
 
+    # TODO: raise if cannot find any initialize/* functions
+
     for {:initialize, arity} <- initializes do
       args = Macro.generate_unique_arguments(arity, env.module)
 
