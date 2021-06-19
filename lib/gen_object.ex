@@ -3,6 +3,10 @@ defmodule GenObject do
     interfaces = Keyword.get(opts, :implements, [])
 
     quote do
+      import Kernel, except: [def: 2]
+      import GenObject, only: [def: 2]
+      require GenObject.Object
+
       for interface <- unquote(interfaces) do
         @beahviour interface
       end
@@ -70,8 +74,35 @@ defmodule GenObject do
     end
   end
 
+  defmacro def({:initialize, _, args} = signature, do: block) when is_list(args) do
+    quote do
+      Kernel.def unquote(signature) do
+        unquote(block)
+      end
+    end
+  end
+
+  defmacro def({name, _, args}, do: block) when is_atom(name) and is_list(args) do
+    [state | rest_args] = args
+
+    quote do
+      def unquote(name)(
+            GenObject.Object.deconstruct(unquote(state)),
+            unquote_splicing(rest_args)
+          ) do
+        unquote(block)
+      end
+    end
+  end
+
   defmodule Object do
     defstruct [:module, :state]
+
+    defmacro deconstruct(pattern) do
+      quote do
+        %unquote(__MODULE__){module: __MODULE__, state: unquote(pattern)}
+      end
+    end
 
     def build(module, state), do: %__MODULE__{module: module, state: state}
     def module(object), do: object.module
@@ -79,7 +110,7 @@ defmodule GenObject do
     def put_state(object, new_state), do: object |> module() |> build(new_state)
 
     def dispatch(object, message, args) do
-      apply(module(object), message, [state(object) | args])
+      apply(module(object), message, [object | args])
     end
   end
 
