@@ -81,6 +81,13 @@ defmodule GenObject do
       end
     end
 
+    @behaviour Access
+
+    @impl true
+    def fetch(object, item) do
+      dispatch(object, :fetch, [item])
+    end
+
     def build(module, state), do: %__MODULE__{module: module, state: state}
     def module(object), do: object.module
     def state(object), do: object.state

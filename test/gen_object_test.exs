@@ -89,7 +89,17 @@ defmodule ErlQueue do
 end
 
 defmodule ListQueue do
-  use GenObject, implements: [Queue]
+  use GenObject, implements: [Queue, Access]
+
+  def fetch(queue, 0) do
+    {item, _} = dequeue(queue)
+    {:ok, item}
+  end
+
+  def fetch(queue, n) do
+    {_item, rest} = dequeue(queue)
+    fetch(rest, n - 1)
+  end
 
   def initialize() do
     []
@@ -114,4 +124,11 @@ end
 
 defmodule ListQueueTest do
   use Queue.Case, async: true, subject: ListQueue.new()
+
+  test "get_in" do
+    q = ListQueue.new() |> Queue.enqueue(1) |> Queue.enqueue(2)
+
+    assert get_in(q, [0]) == 1
+    assert get_in(q, [1]) == 2
+  end
 end
