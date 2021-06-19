@@ -7,11 +7,17 @@ defmodule GenObject do
   end
 
   defmacro implement(interface, do: block) do
+    for = __CALLER__.module
+
     quote do
       name = Module.concat(unquote(interface), __MODULE__)
 
       defmodule name do
         @behaviour Elixir.unquote(interface)
+
+        defp new(state) do
+          GenObject.Object.build(unquote(for), state)
+        end
 
         _ = unquote(block)
       end
@@ -61,38 +67,14 @@ defmodule GenObject do
     end
   end
 
-  defmacro def([{:fire, {name, _, args}}]) when is_atom(name) and is_list(args) do
+  defmacro def({name, _, args}) when is_atom(name) and is_list(args) do
     arity = length(args)
     type_args = :lists.map(fn _ -> quote(do: term) end, :lists.seq(1, arity))
 
     quote do
       @callback unquote(name)(unquote_splicing(type_args)) :: term
       Kernel.def unquote(name)(unquote_splicing(args)) do
-        GenObject.fire(__MODULE__, unquote(hd(args)), unquote(name), unquote(tl(args)))
-      end
-    end
-  end
-
-  defmacro def([{:morph, {name, _, args}}]) when is_atom(name) and is_list(args) do
-    arity = length(args)
-    type_args = :lists.map(fn _ -> quote(do: term) end, :lists.seq(1, arity))
-
-    quote do
-      @callback unquote(name)(unquote_splicing(type_args)) :: term
-      Kernel.def unquote(name)(unquote_splicing(args)) do
-        GenObject.morph(__MODULE__, unquote(hd(args)), unquote(name), unquote(tl(args)))
-      end
-    end
-  end
-
-  defmacro def([{:ask, {name, _, args}}]) when is_atom(name) and is_list(args) do
-    arity = length(args)
-    type_args = :lists.map(fn _ -> quote(do: term) end, :lists.seq(1, arity))
-
-    quote do
-      @callback unquote(name)(unquote_splicing(type_args)) :: {term, term}
-      Kernel.def unquote(name)(unquote_splicing(args)) do
-        GenObject.ask(__MODULE__, unquote(hd(args)), unquote(name), unquote(tl(args)))
+        GenObject.Object.dispatch(__MODULE__, unquote(hd(args)), unquote(name), unquote(tl(args)))
       end
     end
   end
@@ -112,21 +94,5 @@ defmodule GenObject do
 
   def new(module, opts \\ []) do
     Object.build(module, apply(module, :initialize, opts))
-  end
-
-  def fire(interface, object, message, args) do
-    Object.dispatch(interface, object, message, args)
-  end
-
-  def morph(interface, object, message, args) do
-    new_state = Object.dispatch(interface, object, message, args)
-
-    Object.put_state(object, new_state)
-  end
-
-  def ask(interface, object, message, args) do
-    {output, new_state} = Object.dispatch(interface, object, message, args)
-
-    {output, Object.put_state(object, new_state)}
   end
 end

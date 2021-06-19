@@ -1,7 +1,7 @@
 require GenObject
 
 GenObject.definterface GenMover do
-  def fire: run(mover, source, destination)
+  def run(mover, source, destination)
 end
 
 defmodule ConcatMover do

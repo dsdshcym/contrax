@@ -1,9 +1,8 @@
 require GenObject
 
 GenObject.definterface Queue do
-  def morph: enqueue(queue, item)
-
-  def ask: dequeue(queue)
+  def enqueue(queue, item)
+  def dequeue(queue)
 
   def to_list(queue) do
     case dequeue(queue) do
@@ -60,16 +59,16 @@ defmodule ErlQueue do
 
   implement Queue do
     def enqueue(state, item) do
-      :queue.in(item, state)
+      new(:queue.in(item, state))
     end
 
     def dequeue(state) do
       case :queue.out(state) do
         {{:value, item}, new_state} ->
-          {item, new_state}
+          {item, new(new_state)}
 
         {:empty, new_state} ->
-          {:empty, new_state}
+          {:empty, new(new_state)}
       end
     end
   end
@@ -88,16 +87,16 @@ defmodule ListQueue do
 
   implement Queue do
     def enqueue(state, item) do
-      state ++ [item]
+      new(state ++ [item])
     end
 
     def dequeue(state) do
       case state do
         [item | rest] ->
-          {item, rest}
+          {item, new(rest)}
 
         [] ->
-          {:empty, state}
+          {:empty, new(state)}
       end
     end
   end
