@@ -99,8 +99,8 @@ defmodule ListQueue do
     construct(state ++ [item])
   end
 
-  def dequeue(deconstruct([])) do
-    {:empty, construct([])}
+  def dequeue(deconstruct([]) = this) do
+    {:empty, this}
   end
 
   def dequeue(deconstruct([item | rest])) do
