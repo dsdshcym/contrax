@@ -89,7 +89,11 @@ defmodule ErlQueue do
 end
 
 defmodule ListQueue do
-  use GenObject, implements: [Queue, Access]
+  use GenObject, implements: [Queue, Access, Enumerable]
+
+  def count(deconstruct(state)) do
+    {:ok, length(state)}
+  end
 
   def fetch(queue, 0) do
     {item, _} = dequeue(queue)
