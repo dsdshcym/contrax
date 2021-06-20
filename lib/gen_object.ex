@@ -109,7 +109,7 @@ defmodule GenObject do
       case_opts = Keyword.delete(opts, :for)
 
       quote do
-        use unquote(for), unquote(case_opts)
+        use unquote(for).Case, unquote(case_opts)
       end
     end
 
