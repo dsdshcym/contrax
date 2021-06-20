@@ -89,7 +89,7 @@ defmodule GenObject do
       defprotocol unquote(name) do
         import Protocol, except: [def: 1]
         import GenObject, only: [defcallback: 1]
-        import GenObject.Case, only: [defterms: 1]
+        import GenObject.Case, only: [defterms: 2]
         import Kernel
 
         _ = unquote(block)
@@ -113,8 +113,9 @@ defmodule GenObject do
       end
     end
 
-    defmacro defterms(do: block) do
+    defmacro defterms(vars, do: block) do
       block = {:quote, [], [[do: block]]}
+      default_subjects = Keyword.fetch!(vars, :subjects)
 
       quote do
         # TODO: raise if defterms is not called inside an interface module
@@ -127,6 +128,17 @@ defmodule GenObject do
           defmacro __using__(opts) do
             subjects = Keyword.get(opts, :subjects, [])
 
+            defaults =
+              for name <- unquote(default_subjects) do
+                quote do
+                  defp unquote(name)() do
+                    raise "xxx"
+                  end
+
+                  defoverridable([{unquote(name), 0}])
+                end
+              end
+
             privates =
               for {name, body} <- subjects do
                 quote do
@@ -136,7 +148,7 @@ defmodule GenObject do
                 end
               end
 
-            {:__block__, [], [unquote(block) | privates]}
+            {:__block__, [], [unquote(block) | defaults ++ privates]}
           end
         end
       end

@@ -4,7 +4,7 @@ GenObject.definterface Queue do
   defcallback(enqueue(queue, item))
   defcallback(dequeue(queue))
 
-  defterms do
+  defterms subjects: [:queue] do
     test "concat" do
       q1 = queue() |> Queue.enqueue(1) |> Queue.enqueue(2)
       q2 = queue() |> Queue.enqueue(3) |> Queue.enqueue(4)
