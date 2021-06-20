@@ -9,11 +9,8 @@ defmodule GenObject do
         Enum.split_with(
           interfaces,
           fn module ->
-            try do
-              Protocol.assert_protocol!(module) == :ok
-            rescue
-              _e in ArgumentError -> false
-            end
+            Code.ensure_loaded?(module) and function_exported?(module, :__protocol__, 1) and
+              module.__protocol__(:module) == module
           end
         )
 
