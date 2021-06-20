@@ -107,10 +107,14 @@ defmodule GenObject do
       # TODO: raise if defterms is not called inside an interface module
 
       defmodule Case do
-        use ExUnit.CaseTemplate
+        use ExUnit.Callbacks
 
-        using unquote(var) = opts do
-          unquote(block)
+        import ExUnit.Assertions
+
+        defmacro __using__(unquote(var) = opts) do
+          result = unquote(block)
+
+          {:__block__, [], [result]}
         end
       end
     end
