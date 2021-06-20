@@ -89,7 +89,7 @@ defmodule GenObject do
       defprotocol unquote(name) do
         import Protocol, except: [def: 1]
         import GenObject, only: [defcallback: 1]
-        import GenObject.Case, only: [defterms: 2]
+        import GenObject.Case, only: [defterms: 1]
         import Kernel
 
         _ = unquote(block)
@@ -113,7 +113,7 @@ defmodule GenObject do
       end
     end
 
-    defmacro defterms(var, do: block) do
+    defmacro defterms(do: block) do
       quote do
         # TODO: raise if defterms is not called inside an interface module
 
@@ -122,10 +122,19 @@ defmodule GenObject do
 
           import ExUnit.Assertions
 
-          defmacro __using__(unquote(var) = opts) do
-            result = unquote(block)
+          defmacro __using__(opts) do
+            subjects = Keyword.get(opts, :subjects, [])
 
-            {:__block__, [], [result]}
+            privates =
+              for {name, body} <- subjects do
+                quote do
+                  defp unquote(name)() do
+                    unquote(body)
+                  end
+                end
+              end
+
+            {:__block__, [], [unquote(block) | privates]}
           end
         end
       end

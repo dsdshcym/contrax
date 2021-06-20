@@ -4,17 +4,11 @@ GenObject.definterface Queue do
   defcallback(enqueue(queue, item))
   defcallback(dequeue(queue))
 
-  defterms opts do
-    subject = Keyword.fetch!(opts, :subject)
-
+  defterms do
     quote do
-      defp subject do
-        unquote(subject)
-      end
-
       test "concat" do
-        q1 = subject() |> Queue.enqueue(1) |> Queue.enqueue(2)
-        q2 = subject() |> Queue.enqueue(3) |> Queue.enqueue(4)
+        q1 = queue() |> Queue.enqueue(1) |> Queue.enqueue(2)
+        q2 = queue() |> Queue.enqueue(3) |> Queue.enqueue(4)
 
         assert q1
                |> Queue.concat(q2)
@@ -24,7 +18,7 @@ GenObject.definterface Queue do
 
       describe "enqueue |> dequeue" do
         test "first in first out" do
-          q1 = subject() |> Queue.enqueue(1) |> Queue.enqueue(2)
+          q1 = queue() |> Queue.enqueue(1) |> Queue.enqueue(2)
           assert {1, q2} = Queue.dequeue(q1)
           assert {2, q3} = Queue.dequeue(q2)
           assert {:empty, ^q3} = Queue.dequeue(q3)
@@ -33,7 +27,7 @@ GenObject.definterface Queue do
 
       describe "enqueue |> to_list" do
         test "first in first out" do
-          assert subject()
+          assert queue()
                  |> Queue.enqueue(1)
                  |> Queue.enqueue(2)
                  |> Queue.enqueue(3)
