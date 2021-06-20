@@ -88,7 +88,8 @@ defmodule GenObject do
     quote do
       defprotocol unquote(name) do
         import Protocol, except: [def: 1]
-        import GenObject, only: [defcallback: 1, defterms: 2]
+        import GenObject, only: [defcallback: 1]
+        import GenObject.Case, only: [defterms: 2]
         import Kernel
 
         _ = unquote(block)
@@ -102,19 +103,21 @@ defmodule GenObject do
     end
   end
 
-  defmacro defterms(var, do: block) do
-    quote do
-      # TODO: raise if defterms is not called inside an interface module
+  defmodule Case do
+    defmacro defterms(var, do: block) do
+      quote do
+        # TODO: raise if defterms is not called inside an interface module
 
-      defmodule Case do
-        use ExUnit.Callbacks
+        defmodule Case do
+          use ExUnit.Callbacks
 
-        import ExUnit.Assertions
+          import ExUnit.Assertions
 
-        defmacro __using__(unquote(var) = opts) do
-          result = unquote(block)
+          defmacro __using__(unquote(var) = opts) do
+            result = unquote(block)
 
-          {:__block__, [], [result]}
+            {:__block__, [], [result]}
+          end
         end
       end
     end
