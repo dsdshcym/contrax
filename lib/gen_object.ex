@@ -61,7 +61,6 @@ defmodule GenObject do
         def build(module, state), do: %__MODULE__{module: module, state: state}
         def module(object), do: object.module
         def state(object), do: object.state
-        def put_state(object, new_state), do: object |> module() |> build(new_state)
       end
     end
   end
