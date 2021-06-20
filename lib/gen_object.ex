@@ -128,7 +128,7 @@ defmodule GenObject do
             privates =
               for {name, body} <- subjects do
                 quote do
-                  defp unquote(name)() do
+                  defp subject(unquote(name)) do
                     unquote(body)
                   end
                 end
