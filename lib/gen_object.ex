@@ -104,6 +104,8 @@ defmodule GenObject do
 
   defmacro defterms(var, do: block) do
     quote do
+      # TODO: raise if defterms is not called inside an interface module
+
       defmodule Case do
         use ExUnit.CaseTemplate
 
