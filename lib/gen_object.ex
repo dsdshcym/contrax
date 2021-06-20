@@ -114,6 +114,8 @@ defmodule GenObject do
     end
 
     defmacro defterms(do: block) do
+      block = {:quote, [], [[do: block]]}
+
       quote do
         # TODO: raise if defterms is not called inside an interface module
 
