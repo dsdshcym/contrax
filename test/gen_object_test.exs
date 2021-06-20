@@ -1,11 +1,11 @@
 defmodule ErlQueueTest do
   use ExUnit.Case, async: true
-  use Queue.Case, subject: ErlQueue.new()
+  use GenObject.Case, for: Queue.Case, subject: ErlQueue.new()
 end
 
 defmodule ListQueueTest do
   use ExUnit.Case, async: true
-  use Queue.Case, subject: ListQueue.new()
+  use GenObject.Case, for: Queue.Case, subject: ListQueue.new()
 
   test "get_in" do
     q = ListQueue.new() |> Queue.enqueue(1) |> Queue.enqueue(2)

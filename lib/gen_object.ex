@@ -104,6 +104,15 @@ defmodule GenObject do
   end
 
   defmodule Case do
+    defmacro __using__(opts) do
+      for = Keyword.fetch!(opts, :for)
+      case_opts = Keyword.delete(opts, :for)
+
+      quote do
+        use unquote(for), unquote(case_opts)
+      end
+    end
+
     defmacro defterms(var, do: block) do
       quote do
         # TODO: raise if defterms is not called inside an interface module
