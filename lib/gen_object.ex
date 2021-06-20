@@ -65,10 +65,6 @@ defmodule GenObject do
         def module(object), do: object.module
         def state(object), do: object.state
         def put_state(object, new_state), do: object |> module() |> build(new_state)
-
-        def dispatch(object, message, args) do
-          apply(module(object), message, [object | args])
-        end
       end
     end
   end
@@ -108,9 +104,5 @@ defmodule GenObject do
     quote do
       Protocol.def(unquote(signature))
     end
-  end
-
-  def dispatch(object, message, args) do
-    object.__struct__.dispatch(object, message, args)
   end
 end
