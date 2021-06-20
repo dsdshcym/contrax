@@ -94,37 +94,19 @@ defmodule GenObject do
 
   defmacro definterface(name, do: block) do
     quote do
-      defmodule unquote(name) do
-        import Kernel,
-          except: [
-            def: 1,
-            defp: 1,
-            defp: 2,
-            defdelegate: 2,
-            defguard: 1,
-            defguardp: 1,
-            defmacro: 1,
-            defmacro: 2,
-            defmacrop: 1,
-            defmacrop: 2
-          ]
-
-        import GenObject, only: [def: 1]
+      defprotocol unquote(name) do
+        import Protocol, except: [def: 1]
+        import GenObject, only: [defcallback: 1]
+        import Kernel
 
         _ = unquote(block)
       end
     end
   end
 
-  defmacro def({name, _, args}) when is_atom(name) and is_list(args) do
-    arity = length(args)
-    type_args = :lists.map(fn _ -> quote(do: term) end, :lists.seq(1, arity))
-
+  defmacro defcallback(signature) do
     quote do
-      @callback unquote(name)(unquote_splicing(type_args)) :: term
-      Kernel.def unquote(name)(unquote_splicing(args)) do
-        GenObject.dispatch(unquote(hd(args)), unquote(name), unquote(tl(args)))
-      end
+      Protocol.def(unquote(signature))
     end
   end
 

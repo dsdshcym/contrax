@@ -1,8 +1,8 @@
 require GenObject
 
 GenObject.definterface Queue do
-  def enqueue(queue, item)
-  def dequeue(queue)
+  defcallback(enqueue(queue, item))
+  defcallback(dequeue(queue))
 
   def to_list(queue) do
     case dequeue(queue) do
