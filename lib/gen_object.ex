@@ -2,9 +2,27 @@ defmodule GenObject do
   defmacro __using__(opts) do
     interfaces = Keyword.get(opts, :implements, [])
 
-    quote do
-      for interface <- unquote(interfaces) do
-        @behaviour interface
+    quote bind_quoted: [interfaces: interfaces] do
+      implement = __MODULE__
+
+      {protocols, behaviours} =
+        Enum.split_with(
+          interfaces,
+          fn module ->
+            try do
+              Protocol.assert_protocol!(module) == :ok
+            rescue
+              _e in ArgumentError -> false
+            end
+          end
+        )
+
+      for behaviour <- behaviours do
+        @behaviour behaviour
+      end
+
+      for protocol <- protocols do
+        @behaviour protocol
       end
 
       defp construct(state) do
@@ -22,11 +40,25 @@ defmodule GenObject do
       defmodule Object do
         defstruct [:module, :state]
 
-        @behaviour Access
+        for behaviour <- behaviours do
+          @behaviour behaviour
 
-        @impl true
-        def fetch(object, item) do
-          dispatch(object, :fetch, [item])
+          for {function, arity} <- behaviour.behaviour_info(:callbacks) do
+            args = Macro.generate_unique_arguments(arity, __MODULE__)
+
+            @impl behaviour
+            defdelegate unquote(function)(unquote_splicing(args)), to: implement
+          end
+        end
+
+        for protocol <- protocols do
+          defimpl protocol do
+            for {function, arity} <- protocol.__protocol__(:functions) do
+              args = Macro.generate_unique_arguments(arity, __MODULE__)
+
+              defdelegate unquote(function)(unquote_splicing(args)), to: implement
+            end
+          end
         end
 
         def build(module, state), do: %__MODULE__{module: module, state: state}
