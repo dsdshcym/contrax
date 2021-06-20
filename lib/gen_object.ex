@@ -88,7 +88,7 @@ defmodule GenObject do
     quote do
       defprotocol unquote(name) do
         import Protocol, except: [def: 1]
-        import GenObject, only: [defcallback: 1]
+        import GenObject, only: [defcallback: 1, defterms: 2]
         import Kernel
 
         _ = unquote(block)
@@ -99,6 +99,18 @@ defmodule GenObject do
   defmacro defcallback(signature) do
     quote do
       Protocol.def(unquote(signature))
+    end
+  end
+
+  defmacro defterms(var, do: block) do
+    quote do
+      defmodule Case do
+        use ExUnit.CaseTemplate
+
+        using unquote(var) = opts do
+          unquote(block)
+        end
+      end
     end
   end
 end
