@@ -61,17 +61,17 @@ defmodule ErlQueue do
     :queue.new()
   end
 
-  def enqueue(deconstruct(state), item) do
-    construct(:queue.in(item, state))
+  def enqueue(matcho(state), item) do
+    buildo(:queue.in(item, state))
   end
 
-  def dequeue(deconstruct(state)) do
+  def dequeue(matcho(state)) do
     case :queue.out(state) do
       {{:value, item}, new_state} ->
-        {item, construct(new_state)}
+        {item, buildo(new_state)}
 
       {:empty, new_state} ->
-        {:empty, construct(new_state)}
+        {:empty, buildo(new_state)}
     end
   end
 end
@@ -79,7 +79,7 @@ end
 defmodule ListQueue do
   use GenObject, implements: [Queue, Access, Enumerable]
 
-  def count(deconstruct(state)) do
+  def count(matcho(state)) do
     {:ok, length(state)}
   end
 
@@ -97,15 +97,15 @@ defmodule ListQueue do
     []
   end
 
-  def enqueue(deconstruct(state), item) do
-    construct(state ++ [item])
+  def enqueue(matcho(state), item) do
+    buildo(state ++ [item])
   end
 
-  def dequeue(deconstruct([]) = this) do
+  def dequeue(matcho([]) = this) do
     {:empty, this}
   end
 
-  def dequeue(deconstruct([item | rest])) do
-    {item, construct(rest)}
+  def dequeue(matcho([item | rest])) do
+    {item, buildo(rest)}
   end
 end

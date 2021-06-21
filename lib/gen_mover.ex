@@ -11,7 +11,7 @@ defmodule ConcatMover do
     [m1, m2]
   end
 
-  def run(deconstruct([m1, m2]), source, destination) do
+  def run(matcho([m1, m2]), source, destination) do
     with :ok <- GenMover.run(m1, source, destination),
          :ok <- GenMover.run(m2, source, destination) do
       :ok
@@ -26,7 +26,7 @@ defmodule OKMover do
     __MODULE__
   end
 
-  def run(deconstruct(OKMover), _source, _destination) do
+  def run(matcho(OKMover), _source, _destination) do
     :ok
   end
 end
@@ -38,7 +38,7 @@ defmodule ErrorMover do
     error
   end
 
-  def run(deconstruct(error), _source, _destination) do
+  def run(matcho(error), _source, _destination) do
     {:error, error}
   end
 end

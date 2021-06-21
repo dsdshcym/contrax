@@ -22,11 +22,11 @@ defmodule GenObject do
         @behaviour protocol
       end
 
-      defp construct(state) do
+      defp buildo(state) do
         __MODULE__.Object.build(__MODULE__, state)
       end
 
-      defmacrop deconstruct(pattern) do
+      defmacrop matcho(pattern) do
         quote do
           %{module: __MODULE__, state: unquote(pattern)}
         end
