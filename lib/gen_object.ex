@@ -28,14 +28,14 @@ defmodule GenObject do
 
       defmacrop matcho(pattern) do
         quote do
-          %{module: __MODULE__, state: unquote(pattern)}
+          %__MODULE__.Object{state: unquote(pattern)}
         end
       end
 
       @before_compile GenObject
 
       defmodule Object do
-        defstruct [:module, :state]
+        defstruct [:state]
 
         for behaviour <- behaviours do
           @behaviour behaviour
@@ -58,9 +58,7 @@ defmodule GenObject do
           end
         end
 
-        def build(module, state), do: %__MODULE__{module: module, state: state}
-        def module(object), do: object.module
-        def state(object), do: object.state
+        def build(module, state), do: %__MODULE__{state: state}
       end
     end
   end
