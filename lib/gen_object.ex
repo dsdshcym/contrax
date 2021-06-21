@@ -121,10 +121,6 @@ defmodule GenObject do
         # TODO: raise if defterms is not called inside an interface module
 
         defmodule Case do
-          use ExUnit.Callbacks
-
-          import ExUnit.Assertions
-
           defmacro __using__(opts) do
             subjects = Keyword.get(opts, :subjects, [])
 
