@@ -20,3 +20,22 @@ defmodule ListQueueTest do
     assert Enum.count(q) == 2
   end
 end
+
+defmodule MockQueueTest do
+  use ExUnit.Case, async: true
+
+  test "1, 2" do
+    mock =
+      GenObject.Mock.new()
+      |> GenObject.Mock.expect(Queue, :enqueue, fn _mock, n -> {:ok, n} end)
+
+    assert Queue.enqueue(mock, 1) == {:ok, 1}
+    GenObject.Mock.verify!(mock)
+
+    mock =
+      GenObject.Mock.new()
+      |> GenObject.Mock.stub(Queue, :dequeue, fn _mock -> {:ok, :test} end)
+
+    assert Queue.dequeue(mock) == {:ok, :test}
+  end
+end
